@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog</title>
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+
+</head>
+
+<body>
+    <%- include("partials/header.ejs", { username: username }) %>
+    
+    
+    <div class="container px-4 py-5  " id="custom-cards">
+        
+        <h2 class="pb-2 border-bottom">Hot posts</h2>
+        <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5 d-flex justify-content-around">
+            <% for (let index = 0; index < 3; index++) { %>
+                <div class="col">
+                    <div class="card -hidden text-bg-dark rounded-4 shadow-lg" style="background-image: url('unsplash-photo-<%= index + 1 %>.jpg');">
+                        <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1 heading">
+                            <p class="pt-5 mt-5 mb-4 display-6 lh-1 fw-bold">
+                                <% if (posts.length === 0 || index >= posts.length) { %>
+                                    <a href="#template">Template Post</a>
+                                <% } else { %>
+                                    <a href="#post<%= index %>"><%= posts[index].titleSubmitted %></a>
+                                <% } %>
+                            <p>
+                            <!-- Other content details for the card -->
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+
+        <div class="container ">
+        
+            <button class="button justify-content-center"type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" > 
+                Create a new entry
+                <div class="hoverEffect">
+                    <div></div>
+                </div>
+            </button>
+            <div class="collapse" id="collapseExample" >
+                <div class="card card-body">
+                    <div class="mb-3">
+                        <form action="/submit" method="POST">
+                            <label for="title1" class="form-label">Write an original title here</label>
+                            <input type="text" class="form-control" name="title-post" placeholder="Type here.." id="title1" required>
+            
+                
+                        <div class="mb-3">
+                            <label for="post11" class="form-label">Write about your life</label>
+                            <textarea type="text" name="post1" placeholder="Type here.." class="form-control" id="post11" rows="3" required></textarea>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" value="Confirm" class="btn button"> Confirm
+                                <div class="hoverEffect">
+                                <div>
+                                    
+                                </div>
+                            </div>
+                            </button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    
+    
+    <div class="container">
+
+    <%if(locals.posts && locals.posts.length > 0){%>
+    <% locals.posts.forEach((post, index) => { %>
+            <div id="post<%= index %>">  
+                <div class="post-content" <% if (post.isEditing) { %>style="display: none;"<% } %>>
+                    <h2> <%= post.titleSubmitted %> </h2>
+                    <p> <%=post.postSubmitted %> </p>
+                
+                <div class="dropdown">
+                    <button class="button options dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <div class="hoverEffect">
+                            <div></div>
+                        </div>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <form action="/edit/<%= index %>" method="GET">
+                            <button type="submit" class="dropdown-item">Edit</button>
+                        </form>
+                        <form action="/delete/<%= index %>" method="POST">
+                            <button type="submit" class="dropdown-item">Delete post</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+       
+        <!-- Display edit form -->
+        <div class="mb-3" <% if (!post.isEditing) { %>style="display: none;"<% } %>>
+            <!-- This div is conditionally hidden based on the value of post.isEditing -->
+        
+            <form action="/update/<%= index %>" method="POST">
+                <!-- Form to update the post with the action attribute pointing to the update route -->
+        
+                <label class="form=label" for="updatedTitle">Updated Title:</label>
+                <input type="text" name="updatedTitle" value="<%= post.titleSubmitted %>" class="form-control" required>
+                <!-- Input field for the updated title with a default value from post.titleSubmitted -->
+        
+                <label for="updatedPost">Updated Post:</label>
+                <textarea name="updatedPost" class="form-control" rows="5" required><%= post.postSubmitted %></textarea>
+                <!-- Textarea for the updated post with a default value from post.postSubmitted -->
+        
+                <div class="button-container">
+                    <!-- Container for buttons to appear side by side -->
+                    <button class="button" type="submit" value="Update">
+                        <!-- Submit button to update the post -->
+                        Update 
+                        <div class="hoverEffect">
+                            <div></div>
+                        </div>
+                    </button>
+        
+                    <form action="/cancel-edit/<%= index %>" method="GET">
+                        <!-- Form to cancel the edit with the action attribute pointing to the cancel-edit route -->
+                        <button class="button">Cancel
+                            <!-- Button to cancel the edit -->
+                            <div class="hoverEffect">
+                                <div></div>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </form>
+        </div>
+    </div>
+   
+    <% }); %>
+    <% }else{ %>
+  <h1> Blog web app</h1>
+
+<% } %>
+</div>
+<!-- Displaying the template post --> 
+<div id="template" class="container">
+    <h1>Template Post</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed felis libero, efficitur sed ullamcorper non, finibus et lectus. Sed luctus mauris at lectus pharetra, et vestibulum nisl vehicula. Donec pharetra ac odio at luctus. Nunc id sapien rhoncus, lacinia eros vitae, posuere arcu. Duis mi diam, porttitor sit amet finibus quis, pretium non dui. Nunc quis pharetra massa. Nulla mauris erat, porttitor id risus eu, auctor malesuada lacus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed faucibus nisi id hendrerit accumsan. Suspendisse risus tortor, vestibulum et feugiat vehicula, tempus eget sapien. Maecenas quis ipsum commodo, ultricies nisl ac, lobortis neque.
+
+        Cras est risus, elementum in dictum quis, pretium nec nulla. Sed id quam vitae metus ultricies vestibulum at eu velit. Pellentesque gravida felis ante, sed facilisis quam pretium in. Aliquam sodales, velit ac sodales euismod, lorem nibh porta est, quis condimentum neque ante porttitor ante. Suspendisse at nibh enim. Aenean ut elit orci. Pellentesque ullamcorper risus quis dui laoreet, quis condimentum erat sagittis.
+        
+        Ut sit amet rutrum ante. Cras dignissim turpis a fermentum hendrerit. Curabitur ultricies mattis velit. Morbi porta elit metus, vitae congue quam faucibus eget. Etiam vitae enim pulvinar, ultrices felis eu, imperdiet erat. Aenean semper lectus sed neque sodales tempus. Proin at tristique justo. Donec ultricies, dui vel posuere posuere, tellus ipsum dignissim lorem, ac malesuada ipsum sapien et magna. Aenean non arcu sollicitudin dolor scelerisque congue quis ac dui.
+        
+        Sed vehicula felis lorem, vel rutrum sem viverra accumsan. Duis viverra feugiat egestas. Vivamus ac risus magna. Integer rutrum eleifend nibh vel mollis. Mauris condimentum ultrices metus, ut rutrum ipsum gravida id. Nulla sit amet dui cursus, imperdiet purus a, fringilla sem. Vivamus consectetur a purus sit amet efficitur.
+        
+        Morbi volutpat bibendum sagittis. Mauris tincidunt ipsum elit, sed convallis ex iaculis eu. Nullam massa mauris, pharetra eget aliquam vitae, finibus eu nulla. Sed tincidunt vel augue at ornare. Sed pellentesque turpis magna, vel consectetur tortor interdum vel. Nunc eros mauris, blandit ut egestas nec, commodo a purus. Integer faucibus laoreet eros, nec volutpat arcu dapibus quis. Maecenas aliquam tempus augue eget convallis. Vestibulum in porttitor quam. Morbi a nulla dolor. Maecenas lobortis tempor nunc id eleifend. Aenean mollis mauris augue, lobortis viverra leo tincidunt ut. In eu ipsum dignissim, volutpat metus eu, bibendum ligula. Nullam lacinia, arcu dictum bibendum semper, diam lacus convallis sem, quis aliquet augue lacus nec mauris.</p>
+</div>
+
+
+    
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  
+<%- include("partials/footer.ejs") %>
+
+</body>
+
+
+</html>
